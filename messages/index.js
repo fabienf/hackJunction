@@ -43,7 +43,7 @@ chatBot.dialog('/', function (session) {
 // Calling Dialogs
 //=========================================================
 
-bot.dialog('/', [
+bot.dialog('/api/calls', [
     function (session) {
         // Send a greeting and start the menu.
         if (!session.userData.welcomed) {
