@@ -1,0 +1,4 @@
+
+MICROSOFT_APP_ID="bd1d47b0-03c3-46b8-b7c7-8a88545759ae"
+MICROSOFT_APP_PASSWORD="rN6GvwqEmkpgHNfY9hx97kn"
+CALLBACK_URL="https://93f490f4.ngrok.io/api/calls"
