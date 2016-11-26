@@ -1,0 +1,25 @@
+weather:
+    - rain
+    - snow
+    - sun
+    - wind
+politics:
+    - anarchy
+    - democracy
+    - republic
+    - cumunism
+    - fasism
+    - dictatorship
+    - dictator
+    - Hilary
+    - Trump
+sports:
+    - football
+    - rugby
+    - baseball
+    - basketball
+    - hockey
+    - voleyball
+    - handball
+    - swimming
+    
