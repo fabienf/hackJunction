@@ -22,16 +22,16 @@ var chatConnector = new builder.ChatConnector({
 var chatBot = new builder.UniversalBot(chatConnector);
 //server.post('/api/messages', chatConnector.listen());
 
-// Create calling bot
-var connector = new calling.CallConnector({
+// Create builder bot
+var connector = new builder.CallConnector({
     callbackUrl: process.env.CALLBACK_URL,
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
-var bot = new calling.UniversalCallBot(connector);
+var bot = new builder.UniversalCallBot(connector);
 //server.post('/api/calls', connector.listen());
 
-var bot = new calling.UniversalCallBot(connector);
+var bot = new builder.UniversalCallBot(connector);
 //=========================================================
 // Chat Dialogs
 //=========================================================
@@ -66,14 +66,14 @@ bot.dialog('/demoMenu', [
     function (session, args) {
         // Build up a stack of prompts to play
         var list = [];
-        list.push(calling.Prompt.text(session, prompts.demoMenu.prompt));
+        list.push(builder.Prompt.text(session, prompts.demoMenu.prompt));
         if (!args || args.full) {
-            list.push(calling.Prompt.text(session, prompts.demoMenu.choices));
-            list.push(calling.Prompt.text(session, prompts.demoMenu.help));
+            list.push(builder.Prompt.text(session, prompts.demoMenu.choices));
+            list.push(builder.Prompt.text(session, prompts.demoMenu.help));
         }
 
         // Prompt user to select a menu option
-        calling.Prompts.choice(session, new calling.PlayPromptAction(session).prompts(list), [
+        builder.Prompts.choice(session, new builder.PlayPromptAction(session).prompts(list), [
             { name: 'dtmf', speechVariation: ['dtmf'] },
             { name: 'digits', speechVariation: ['digits'] },
             { name: 'record', speechVariation: ['record', 'recordings'] },
@@ -115,7 +115,7 @@ bot.dialog('/demoMenu', [
 bot.dialog('/dtmf', [
     function (session) {
         session.send(prompts.dtmf.intro);
-        calling.Prompts.choice(session, prompts.dtmf.prompt, [
+        builder.Prompts.choice(session, prompts.dtmf.prompt, [
             { name: 'option A', dtmfVariation: '1' },
             { name: 'option B', dtmfVariation: '2' },
             { name: 'option C', dtmfVariation: '3' }
@@ -135,14 +135,14 @@ bot.dialog('/digits', [
         if (!args || args.full) {
             session.send(prompts.digits.intro);
         }
-        calling.Prompts.digits(session, prompts.digits.prompt, 10, { stopTones: '#' });
+        builder.Prompts.digits(session, prompts.digits.prompt, 10, { stopTones: '#' });
     },
     function (session, results) {
         if (results.response) {
             // Confirm the users account is valid length otherwise reprompt.
             if (results.response.length >= 5) {
-                var prompt = calling.PlayPromptAction.text(session, prompts.digits.confirm, results.response);
-                calling.Prompts.confirm(session, prompt, results.response);
+                var prompt = builder.PlayPromptAction.text(session, prompts.digits.confirm, results.response);
+                builder.Prompts.confirm(session, prompt, results.response);
             } else {
                 session.send(prompts.digits.inavlid);
                 session.replaceDialog('/digits', { full: false });
@@ -152,7 +152,7 @@ bot.dialog('/digits', [
         }
     },
     function (session, results) {
-        if (results.resumed == calling.ResumeReason.completed) {
+        if (results.resumed == builder.ResumeReason.completed) {
             if (results.response) {
                 session.endDialog();
             } else {
@@ -167,7 +167,7 @@ bot.dialog('/digits', [
 bot.dialog('/record', [
     function (session) {
         session.send(prompts.record.intro);
-        calling.Prompts.record(session, prompts.record.prompt, { playBeep: true });
+        builder.Prompts.record(session, prompts.record.prompt, { playBeep: true });
     },
     function (session, results) {
         if (results.response) {
@@ -183,7 +183,7 @@ bot.dialog('/record', [
 bot.dialog('/chat', [
     function (session) {
         session.send(prompts.chat.intro);
-        calling.Prompts.confirm(session, prompts.chat.confirm);        
+        builder.Prompts.confirm(session, prompts.chat.confirm);        
     },
     function (session, results) {
         if (results.response) {
