@@ -1,6 +1,5 @@
 import yaml, os
 import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 
 
 # get path of the script
@@ -15,36 +14,28 @@ with open( cpath + 'topics.yaml', 'rb' ) as f:
 keywords = np.concatenate( [
     np.asarray( topic_values ) for topic_values in topics.values()
 ] )
-count_vect = CountVectorizer()
-count_vect.fit( keywords )
 
 
 def preprocessing( data ):
 
-    # tramsform to number of times that the word appear in the text
-    X_train_counts = count_vect.transform( data )
+    data = data.lower().split()
+
+    x = np.zeros( len( keywords ), dtype=float )
+
+    for i, k in enumerate( keywords ):
+        x[i] = data.count( k )
     
-    # transform to frequency (in [0,1])
-    tfidf_transformer = TfidfTransformer()
-    X_train_tfidf = tfidf_transformer.fit_transform( X_train_counts )
+    Z = len( data ) if len( data ) > 0 else 1.
+    
+    return x / Z
+    
 
-    return X_train_tfidf
-
-
-def train( x, y ):
-    from sklearn.naive_bayes import MultinomialNB
-
-    return MultinomialNB().fit( x, y )
-
-
-def predict( x, tau=.1 ):
+def predict( x, tau=.02 ):
     # transform the data
-    x0 = preprocessing( x )
-    print x.shape, keywords.shape
-    print x0
+    x = preprocessing( x )
     
     # get the keywords with the highest freequency
-    ks = keywords[x0 >= tau]
+    ks = keywords[x >= tau]
 
     y = {}
     for k in ks:
@@ -57,12 +48,31 @@ def predict( x, tau=.1 ):
     return y
 
 
+def major_topic( y ):
+
+    if len( y ) == 0:
+        return None, 1.
+    
+    confusion_idx = 0
+    z = y.keys()[0]
+    for topic, w in y.items():
+        if y[z] == w:
+            confusion_idx += 1
+        if y[z] < w:
+            z = topic
+    
+    return z, 1. / confusion_idx
+
+
 if __name__ == "__main__":
+    import sys
     from sklearn.datasets import fetch_20newsgroups
 
     twenty_train = fetch_20newsgroups(subset='train',
             shuffle=True, random_state=42)
+    for i in xrange( len( twenty_train.data ) ):
+        y = predict( twenty_train.data[i] )
+        z, c = major_topic( y )
+        if len( y ) > 0:
+            print z, c
     
-    print twenty_train.data[0]
-    
-    print predict( twenty_train.data[0] )
