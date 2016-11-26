@@ -20,7 +20,7 @@ var chatConnector = new builder.ChatConnector({
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 var chatBot = new builder.UniversalBot(chatConnector);
-//server.post('/api/messages', chatConnector.listen());
+server.post('/api/messages', chatConnector.listen());
 
 // Create builder bot
 var connector = new builder.CallConnector({
@@ -29,7 +29,7 @@ var connector = new builder.CallConnector({
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 var bot = new builder.UniversalCallBot(connector);
-//server.post('/api/calls', connector.listen());
+server.post('/api/calls', connector.listen());
 
 //=========================================================
 // Chat Dialogs
