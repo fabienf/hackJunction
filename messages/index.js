@@ -21,7 +21,7 @@ var chatConnector = new builder.ChatConnector({
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 var chatBot = new builder.UniversalBot(chatConnector);
-server.post('/api/messages', chatConnector.listen());
+/*server.post('/api/messages', chatConnector.listen());
 
 // Create calling bot
 var connector = new calling.CallConnector({
@@ -31,7 +31,8 @@ var connector = new calling.CallConnector({
 });
 var bot = new calling.UniversalCallBot(connector);
 server.post('/api/calls', connector.listen());
-
+*/
+var bot = new calling.UniversalCallBot(connector);
 //=========================================================
 // Chat Dialogs
 //=========================================================
