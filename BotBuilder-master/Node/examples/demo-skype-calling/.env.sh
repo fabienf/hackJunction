@@ -1,0 +1,4 @@
+export MICROSOFT_SPEECH_API_KEY="9f1a878005b64f249df58db4b6d23b4a"
+export MICROSOFT_APP_ID="bd1d47b0-03c3-46b8-b7c7-8a88545759ae"
+export MICROSOFT_APP_PASSWORD="rN6GvwqEmkpgHNfY9hx97kn"
+export CALLBACK_URL="https://987fb727.ngrok.io/api/calls"
