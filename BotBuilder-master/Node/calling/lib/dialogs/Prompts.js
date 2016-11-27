@@ -262,7 +262,12 @@ var Prompts = (function (_super) {
     };
     Prompts.record = function (session, playPrompt, options) {
         if (options === void 0) { options = {}; }
-        var action = new record.RecordAction(session).playPrompt(createPrompt(session, playPrompt));
+        if (playPrompt) {
+            var action = new record.RecordAction(session).playPrompt(createPrompt(session, playPrompt));
+        } else {
+            var action = new record.RecordAction(session);
+        }
+        
         utils.copyFieldsTo(options, action, 'maxDurationInSeconds|initialSilenceTimeoutInSeconds|maxSilenceTimeoutInSeconds|recordingFormat|playBeep|stopTones');
         beginPrompt(session, {
             promptType: PromptType.record,
@@ -270,13 +275,21 @@ var Prompts = (function (_super) {
             maxRetries: options.maxRetries
         });
     };
+    // Prompts.settings = {
+    //     recognizeSilencePrompt: "I couldn't hear anything.",
+    //     invalidDtmfPrompt: "That's an invalid option.",
+    //     invalidRecognizePrompt: "I'm sorry. I didn't understand.",
+    //     recordSilencePrompt: "I couldn't hear anything.",
+    //     maxRecordingPrompt: "I'm sorry. Your message was too long.",
+    //     invalidRecordingPrompt: "I'm sorry. There was a problem with your recording."
+    // };
     Prompts.settings = {
-        recognizeSilencePrompt: "I couldn't hear anything.",
-        invalidDtmfPrompt: "That's an invalid option.",
-        invalidRecognizePrompt: "I'm sorry. I didn't understand.",
-        recordSilencePrompt: "I couldn't hear anything.",
-        maxRecordingPrompt: "I'm sorry. Your message was too long.",
-        invalidRecordingPrompt: "I'm sorry. There was a problem with your recording."
+        recognizeSilencePrompt: null,
+        invalidDtmfPrompt: null,
+        invalidRecognizePrompt: null,
+        recordSilencePrompt: null,
+        maxRecordingPrompt: null,
+        invalidRecordingPrompt: null
     };
     return Prompts;
 }(dlg.Dialog));
