@@ -120,8 +120,11 @@ def get_emails_text(service=None, userId='me', from_address=None, to_address=Non
 
 def summarize_email(email):
     summary = ""
-    text = email[0] + ' ' + email[1]
- 
+    if type(email) is list:
+        text = email[0] + ' ' + email[1]
+    else:
+        text = email
+
     try:
         summary = summarize(text)
     except Exception, e:
@@ -132,7 +135,10 @@ def summarize_email(email):
 
 def get_keywords(email):
     keywords_list = []
-    text = email[0] + ' ' + email[1]
+    if type(email) is list:
+        text = email[0] + ' ' + email[1]
+    else:
+        text = email
  
     try:
         keywords_list = keywords(text)
@@ -199,22 +205,26 @@ def main():
     emails = get_emails_text(from_address=from_address, to_address=to_address, before=before, after=after, keywords=keywords)
 
 
-    # date   = parse('2016-11-26')
-    # ndate  = date + timedelta( 1 )
-    # emails = get_emails_text(
-    #     # after=date.strftime( '%Y-%m-%d' ),
-    #     # before=ndate.strftime( '%Y-%m-%d' )
-    # )
-
     emails = [ e[0]+'\n'+e[1] for e in emails]
     # print emails
 
     if len(categories)>0:
         emails = filter_by_topic( emails, categories )
+
+
+    print(json.dumps(emails))
+
+    # emails_with_summary = []
+    # for e in emails:
+    #     summary_of_email = summarize_email(e)
+    #     keywords_of_email = get_keywords(e)
+    #     emails_with_summary.append([e, summary_of_email, keywords_of_email])
+
+    # print(json.dumps(emails_with_summary))
+
     # print emails
 
     # print(emails)
-    print(json.dumps(emails))
 
     # print(summarize_email(emails[0]))
     # print(get_keywords(emails[0]))
