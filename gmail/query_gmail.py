@@ -148,6 +148,7 @@ def main():
     # service = discovery.build('gmail', 'v1', http=http)
 
 
+
     # messages = query_emails(service)
 
     # # print(messages[1])
@@ -177,10 +178,17 @@ def main():
         from_address = params["from_address"]
     if "to_address" in params.keys():
         to_address = params["to_address"]
-    if "before" in params.keys():
-        before = params["before"]
-    if "after" in params.keys():
-        after = params["after"]
+
+    if "date" in params.keys():
+        date = parse(params["date"])
+        ndate  = date - timedelta( 1 )
+        after=ndate.strftime( '%Y-%m-%d' )
+        before=date.strftime( '%Y-%m-%d' )
+    else:
+        if "before" in params.keys():
+            before = params["before"]
+        if "after" in params.keys():
+            after = params["after"]
     if "keywords" in params.keys():
         keywords = params["keywords"]
 
