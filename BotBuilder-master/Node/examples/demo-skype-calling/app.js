@@ -42,7 +42,6 @@ var builder = require('../../core/');
 var calling = require('../../calling/');
 var prompts = require('./prompts');
 var PythonShell = require('python-shell');
-var pyshell = new PythonShell('dialog_to_text_test.py');
 var JSON5 = require('json5');
 var fs = require('fs');
 
@@ -97,18 +96,26 @@ server.post('/api/messages', function (req, res) {
 
 
 function stt(audio_data) {
+    var pyshell = new PythonShell('dialog_to_text.py');
+    
+    log("[INFO]: ", "sending started")
     var stringifiedAudioData = JSON5.stringify(audio_data);
     var target = audio_data.recordedAudio;
     var jsonObj = JSON5.stringify(target);
 
     pyshell.send(jsonObj);
+    log("[INFO]: ","SENT MSG");
     pyshell.on('message', function (message) {
       console.log(message);
     });
     
-    // pyshell.end(function (err) {
-    //   console.log('PYSHELL finished');
-    // });
+    pyshell.end(function (err) {
+        if (err) {
+            console.error('PYSHELL error occured: ' + err);
+        }
+        
+        console.log('PYSHELL finished');
+    });
 }
 
 var started = false;
@@ -142,6 +149,7 @@ bot.dialog('/', [
         if (results.response !== true && results.response !== undefined) {
             log("Response", "OK");
             stt(results.response);
+            log("[INFO]: ", "SENT")
             
             // session.endDialog(prompts.record.result, results.response.lengthOfRecordingInSecs);
         } else {
