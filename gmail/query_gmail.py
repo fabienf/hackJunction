@@ -10,6 +10,9 @@ from oauth2client.file import Storage
 
 from gensim.summarization import summarize, keywords
 
+import fileinput
+import json
+
 from IPython import embed
 
 # try:
@@ -77,6 +80,8 @@ def query_emails(service=None, userId='me', from_address=None, to_address=None, 
     if keywords is not None:
         query += keywords
 
+    # print ([from_address])
+
     mail_ids = service.users().messages().list(userId=userId, q=query).execute()
 
     messages = []
@@ -100,8 +105,10 @@ def get_emails_text(service=None, userId='me', from_address=None, to_address=Non
 
     messages_text = []
     for i in range(len(messages)):
-        subject = get_subject(messages[i])
-        body =  messages[i]['snippet'] 
+        # subject = str(get_subject(messages[i]))  # str to convert from unicode to string
+        # body = str( messages[i]['snippet'] )
+        subject = get_subject(messages[i])  # str to convert from unicode to string
+        body = messages[i]['snippet'] 
         messages_text.append([subject,body])
 
     return messages_text
@@ -132,22 +139,52 @@ def get_keywords(email):
 
 def main():
     """Gmail API."""
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('gmail', 'v1', http=http)
+    # credentials = get_credentials()
+    # http = credentials.authorize(httplib2.Http())
+    # service = discovery.build('gmail', 'v1', http=http)
 
 
-    messages = query_emails(service)
+    # messages = query_emails(service)
 
-    # print(messages[1])
+    # # print(messages[1])
 
-    for i in range(len(messages)):
-        print( get_subject(messages[i])) 
-        print( messages[i]['snippet'] + "\n")
+    # for i in range(len(messages)):
+    #     print( get_subject(messages[i])) 
+    #     print( messages[i]['snippet'] + "\n")
 
-    emails = get_emails_text()
-    print(summarize_email(emails[0]))
-    print(get_keywords(emails[0]))
+    params = ""
+    for line in fileinput.input():
+        params += line
+
+    # embed()
+    # print(params)
+    params = json.loads(params)
+    # print([type(params)]) 
+
+    from_address=None 
+    to_address=None 
+    before=None 
+    after=None
+    keywords=None
+
+    if "from_address" in params.keys():
+        from_address = params["from_address"]
+    if "to_address" in params.keys():
+        to_address = params["to_address"]
+    if "before" in params.keys():
+        before = params["before"]
+    if "after" in params.keys():
+        after = params["after"]
+    if "keywords" in params.keys():
+        keywords = params["keywords"]
+
+    emails = get_emails_text(from_address=from_address, to_address=to_address, before=before, after=after, keywords=keywords)
+
+    # print(emails)
+    print(json.dumps(emails))
+
+    # print(summarize_email(emails[0]))
+    # print(get_keywords(emails[0]))
     # embed()
     # print messages[1]['snippet']
 
