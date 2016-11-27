@@ -69,7 +69,7 @@ class DialogToSpeech:
     def say_it(self, loaded_audio):
         try:
             recognized = self.r.recognize_bing(loaded_audio, key=self.BING_KEY)
-            print("Microsoft Bing Voice Recognition thinks you said " + recognized)
+            print("#135246#" + recognized)
         except sr.UnknownValueError:
             print("Microsoft Bing Voice Recognition could not understand audio")
         except sr.RequestError as e:
