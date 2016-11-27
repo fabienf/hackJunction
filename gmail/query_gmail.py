@@ -10,6 +10,13 @@ from oauth2client.file import Storage
 
 from gensim.summarization import summarize, keywords
 
+import fileinput
+import json
+from datetime import timedelta
+from dateutil.parser import parse
+
+from mail import filter_by_topic
+
 from IPython import embed
 
 # try:
@@ -69,13 +76,15 @@ def query_emails(service=None, userId='me', from_address=None, to_address=None, 
         query += "to:("+to_address+") "
 
     if before is not None:
-        query += "before:("+before+") "
+        query += "before:"+before+" "
 
     if after is not None:
-        query += "after:("+after+") "
+        query += "after:"+after+" "
 
     if keywords is not None:
         query += keywords
+
+    # print ([from_address])
 
     mail_ids = service.users().messages().list(userId=userId, q=query).execute()
 
@@ -100,8 +109,10 @@ def get_emails_text(service=None, userId='me', from_address=None, to_address=Non
 
     messages_text = []
     for i in range(len(messages)):
-        subject = get_subject(messages[i])
-        body =  messages[i]['snippet'] 
+        # subject = str(get_subject(messages[i]))  # str to convert from unicode to string
+        # body = str( messages[i]['snippet'] )
+        subject = get_subject(messages[i])  # str to convert from unicode to string
+        body = messages[i]['snippet'] 
         messages_text.append([subject,body])
 
     return messages_text
@@ -109,8 +120,11 @@ def get_emails_text(service=None, userId='me', from_address=None, to_address=Non
 
 def summarize_email(email):
     summary = ""
-    text = email[0] + ' ' + email[1]
- 
+    if type(email) is list:
+        text = email[0] + ' ' + email[1]
+    else:
+        text = email
+
     try:
         summary = summarize(text)
     except Exception, e:
@@ -121,7 +135,10 @@ def summarize_email(email):
 
 def get_keywords(email):
     keywords_list = []
-    text = email[0] + ' ' + email[1]
+    if type(email) is list:
+        text = email[0] + ' ' + email[1]
+    else:
+        text = email
  
     try:
         keywords_list = keywords(text)
@@ -132,22 +149,85 @@ def get_keywords(email):
 
 def main():
     """Gmail API."""
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('gmail', 'v1', http=http)
+    # credentials = get_credentials()
+    # http = credentials.authorize(httplib2.Http())
+    # service = discovery.build('gmail', 'v1', http=http)
 
 
-    messages = query_emails(service)
 
-    # print(messages[1])
+    # messages = query_emails(service)
 
-    for i in range(len(messages)):
-        print( get_subject(messages[i])) 
-        print( messages[i]['snippet'] + "\n")
+    # # print(messages[1])
 
-    emails = get_emails_text()
-    print(summarize_email(emails[0]))
-    print(get_keywords(emails[0]))
+    # for i in range(len(messages)):
+    #     print( get_subject(messages[i])) 
+    #     print( messages[i]['snippet'] + "\n")
+
+    params = ""
+    for line in fileinput.input():
+        params += line
+
+    # embed()
+    # print(params)
+    params = json.loads(params)
+    # print([type(params)]) 
+
+    from_address=None 
+    to_address=None 
+    before=None 
+    after=None
+    keywords=None
+    categories=[]
+
+
+    if "from_address" in params.keys():
+        from_address = params["from_address"]
+    if "to_address" in params.keys():
+        to_address = params["to_address"]
+
+    if "date" in params.keys():
+        date = parse(params["date"])
+        ndate  = date - timedelta( 1 )
+        after=ndate.strftime( '%Y-%m-%d' )
+        before=date.strftime( '%Y-%m-%d' )
+    else:
+        if "before" in params.keys():
+            before = params["before"]
+        if "after" in params.keys():
+            after = params["after"]
+    if "keywords" in params.keys():
+        keywords = params["keywords"]
+
+    if "categories" in params.keys():
+        categories = params["categories"]
+
+
+    emails = get_emails_text(from_address=from_address, to_address=to_address, before=before, after=after, keywords=keywords)
+
+
+    emails = [ e[0]+'\n'+e[1] for e in emails]
+    # print emails
+
+    if len(categories)>0:
+        emails = filter_by_topic( emails, categories )
+
+
+    print(json.dumps(emails))
+
+    # emails_with_summary = []
+    # for e in emails:
+    #     summary_of_email = summarize_email(e)
+    #     keywords_of_email = get_keywords(e)
+    #     emails_with_summary.append([e, summary_of_email, keywords_of_email])
+
+    # print(json.dumps(emails_with_summary))
+
+    # print emails
+
+    # print(emails)
+
+    # print(summarize_email(emails[0]))
+    # print(get_keywords(emails[0]))
     # embed()
     # print messages[1]['snippet']
 
