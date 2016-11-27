@@ -7,7 +7,7 @@ var pyshell = new PythonShell('query_gmail.py'
 
 
 
-pyshell.send( {"from_address":"ludanev", "keywords":"mail3"}); // put here json object with the query inputs
+pyshell.send( {"from_address":"ludanev", "categories":"sports"}); // put here json object with the query inputs
 
 pyshell.on('message', function (message) {
   // received a message sent from the Python script (a simple "print" statement)

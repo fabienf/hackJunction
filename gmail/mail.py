@@ -1,6 +1,6 @@
 import yaml, os
 import numpy as np
-from query_gmail import get_emails_text
+# from query_gmail import get_emails_text
 
 
 # get path of the script
@@ -68,36 +68,35 @@ def major_topic( y ):
 def filter_by_topic( xs, ts ):
     
     if type( ts ) is not list:
-        topics = [ts]
+        ts = [ts]
 
     filtered = []
     for x in xs:
         y = predict( x )
         if any( [topic in y.keys() for topic in ts] ):
             filtered.append( x )
-            print y
 
     return filtered
 
 
 
-if __name__ == "__main__":
-    from datetime import timedelta
-    from dateutil.parser import parse
+# if __name__ == "__main__":
+#     from datetime import timedelta
+#     from dateutil.parser import parse
 
 
-    date   = parse('2016-11-26')
-    ndate  = date + timedelta( 1 )
-    ts = ['sports']
+#     date   = parse('2016-11-26')
+#     ndate  = date + timedelta( 1 )
+#     ts = ['sports']
 
-    # print date.strftime( '%Y-%m-%d' ), ndate.strftime( '%Y-%m-%d' )
-    emails = get_emails_text(
-        # after=date.strftime( '%Y-%m-%d' ),
-        # before=ndate.strftime( '%Y-%m-%d' )
-    )
+#     # print date.strftime( '%Y-%m-%d' ), ndate.strftime( '%Y-%m-%d' )
+#     emails = get_emails_text(
+#         # after=date.strftime( '%Y-%m-%d' ),
+#         # before=ndate.strftime( '%Y-%m-%d' )
+#     )
 
-    emails = [ e[0]+'\n'+e[1] for e in emails]
-    # print emails
+#     emails = [ e[0]+'\n'+e[1] for e in emails]
+#     # print emails
 
-    emails = filter_by_topic( emails, ts )
-    print emails
+#     emails = filter_by_topic( emails, ts )
+#     print emails

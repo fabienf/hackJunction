@@ -12,6 +12,10 @@ from gensim.summarization import summarize, keywords
 
 import fileinput
 import json
+from datetime import timedelta
+from dateutil.parser import parse
+
+from mail import filter_by_topic
 
 from IPython import embed
 
@@ -166,6 +170,8 @@ def main():
     before=None 
     after=None
     keywords=None
+    categories=[]
+
 
     if "from_address" in params.keys():
         from_address = params["from_address"]
@@ -178,7 +184,26 @@ def main():
     if "keywords" in params.keys():
         keywords = params["keywords"]
 
+    if "categories" in params.keys():
+        categories = params["categories"]
+
+
     emails = get_emails_text(from_address=from_address, to_address=to_address, before=before, after=after, keywords=keywords)
+
+
+    # date   = parse('2016-11-26')
+    # ndate  = date + timedelta( 1 )
+    # emails = get_emails_text(
+    #     # after=date.strftime( '%Y-%m-%d' ),
+    #     # before=ndate.strftime( '%Y-%m-%d' )
+    # )
+
+    emails = [ e[0]+'\n'+e[1] for e in emails]
+    # print emails
+
+    if len(categories)>0:
+        emails = filter_by_topic( emails, categories )
+    # print emails
 
     # print(emails)
     print(json.dumps(emails))
