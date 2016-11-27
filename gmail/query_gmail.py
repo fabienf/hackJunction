@@ -19,6 +19,10 @@ from mail import filter_by_topic
 
 from IPython import embed
 
+
+cpath = os.path.dirname(os.path.abspath(__file__)) + '/'
+# print (cpath)
+# exit()
 # try:
 #     import argparse
 #     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
@@ -28,7 +32,7 @@ from IPython import embed
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/gmail-python-quickstart.json
 SCOPES = 'https://www.googleapis.com/auth/gmail.readonly'
-CLIENT_SECRET_FILE = 'client_secret.json'
+CLIENT_SECRET_FILE = cpath + 'client_secret.json'
 APPLICATION_NAME = 'Gmail API Python Quickstart'
 
 
@@ -42,7 +46,7 @@ def get_credentials():
         Credentials, the obtained credential.
     """
     home_dir = os.path.expanduser('.')
-    credential_dir = os.path.join(home_dir, '.credentials')
+    credential_dir = os.path.join(cpath, '.credentials')
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
     credential_path = os.path.join(credential_dir,
@@ -53,10 +57,10 @@ def get_credentials():
     if not credentials or credentials.invalid:
         flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
-        if flags:
-            credentials = tools.run_flow(flow, store, flags)
-        else: # Needed only for compatibility with Python 2.6
-            credentials = tools.run(flow, store)
+        # if flags:
+        #     credentials = tools.run_flow(flow, store, flags)
+        # else: # Needed only for compatibility with Python 2.6
+        credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
 
@@ -100,7 +104,7 @@ def get_subject(message):
     """in: one email as json
        out: subject of the email """
     for e in message['payload']['headers']:
-        if e['name']== 'Subject':
+        if e['name'] == 'Subject':
             return e['value']
 
 
@@ -155,8 +159,6 @@ def main():
     # http = credentials.authorize(httplib2.Http())
     # service = discovery.build('gmail', 'v1', http=http)
 
-
-
     # messages = query_emails(service)
 
     # # print(messages[1])
@@ -190,8 +192,8 @@ def main():
     if "date" in params.keys():
         date = parse(params["date"])
         ndate  = date - timedelta( 1 )
-        after=ndate.strftime( '%Y-%m-%d' )
-        before=date.strftime( '%Y-%m-%d' )
+        after = ndate.strftime( '%Y-%m-%d' )
+        before = date.strftime( '%Y-%m-%d' )
     else:
         if "before" in params.keys():
             before = params["before"]

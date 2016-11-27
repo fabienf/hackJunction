@@ -1,9 +1,7 @@
 
 
-var PythonShell = require('python-shell');
-var pyshell = new PythonShell('query_gmail.py'
-	, { mode: 'json'}
-);
+var PythonShell = require('python-shell'); //../BotBuilder-master/Node/node_modules/
+var pyshell = new PythonShell('query_gmail.py', { mode: 'json'} );
 
 
 
@@ -18,6 +16,8 @@ pyshell.on('message', function (message) {
 
 // end the input stream and allow the process to exit
 pyshell.end(function (err) {
-  if (err) throw err;
+  if (err) {
+    console.log("CALL_QUERY_GMAIL error: ", err);
+  }
   console.log('finished');
 });
