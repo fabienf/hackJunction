@@ -72,10 +72,10 @@ def query_emails(service=None, userId='me', from_address=None, to_address=None, 
         query += "to:("+to_address+") "
 
     if before is not None:
-        query += "before:("+before+") "
+        query += "before:"+before+" "
 
     if after is not None:
-        query += "after:("+after+") "
+        query += "after:"+after+" "
 
     if keywords is not None:
         query += keywords
