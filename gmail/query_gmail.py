@@ -8,6 +8,8 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
+from gensim.summarization import summarize, keywords
+
 from IPython import embed
 
 # try:
@@ -104,6 +106,30 @@ def get_emails_text(service=None, userId='me', from_address=None, to_address=Non
 
     return messages_text
 
+
+def summarize_email(email):
+    summary = ""
+    text = email[0] + ' ' + email[1]
+ 
+    try:
+        summary = summarize(text)
+    except Exception, e:
+        pass
+
+    return summary
+
+
+def get_keywords(email):
+    keywords_list = []
+    text = email[0] + ' ' + email[1]
+ 
+    try:
+        keywords_list = keywords(text)
+    except Exception, e:
+        pass
+
+    return keywords_list
+
 def main():
     """Gmail API."""
     credentials = get_credentials()
@@ -111,7 +137,7 @@ def main():
     service = discovery.build('gmail', 'v1', http=http)
 
 
-    messages = query_emails(service, keywords="mail2")
+    messages = query_emails(service)
 
     # print(messages[1])
 
@@ -119,6 +145,9 @@ def main():
         print( get_subject(messages[i])) 
         print( messages[i]['snippet'] + "\n")
 
+    emails = get_emails_text()
+    print(summarize_email(emails[0]))
+    print(get_keywords(emails[0]))
     # embed()
     # print messages[1]['snippet']
 
