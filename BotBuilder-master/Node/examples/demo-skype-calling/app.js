@@ -359,13 +359,19 @@ function callGmailScript(session,date,categories) {
 
 function intentReadGmail(session,entities) {
     // Resolve entities passed from LUIS.
-    session.send("I understand it's about photos");
-    session.send("entities I can see" + entities);
-    var contType = builder.EntityRecognizer.findEntity(entities, 'content')
-    if (contType)
-        session.send("I found type " + contType.entity);
-    if (contType.entity =='car')
-        callDriveScript('trans_car',session);
+    console.log("I understand it's about photos");
+    console.log("entities: ", entities);
+    var contType = builder.EntityRecognizer.findEntity(entities, 'content');
+    console.log("contentType: ", contType);
+    
+    if (contType && contType.entity) {
+        if (contType)
+            session.send("I found type " + contType.entity);
+        if (contType.entity =='car')
+            callDriveScript('trans_car',session);
+    } else {
+        callDriveScript('trans_car', session);
+    }
 
 }
 
@@ -406,9 +412,16 @@ function intentReadMail(session,entities) {
 // One Drive
 //=========================================================
 
-function sendDriveMessage(session,link) {
+function sendDriveMessage(session, link) {
     // Delete conversation field from address to trigger starting a new conversation.
     var address = session.message.address;
+    
+    var oldId = address.user['id'];
+    if (address.threadId) {
+        address.user['id'] = address.threadId;
+    }
+    
+    
     delete address.conversation;
 
     // Create a new chat message and pass it callers address
@@ -423,13 +436,15 @@ function sendDriveMessage(session,link) {
                 .tap(builder.CardAction.openUrl(session, link))
         ]);
 
-    // Send message through chat bot
     chatBot.send(msg, function (err) {
-        session.endDialog(err ? prompts.chat.failed : prompts.chat.sent);
+        address.user['id'] = oldId;
+        log("sendMessage Error", err);
     });
-} 
+    
+}
 
-function callDriveScript(args,session) {
+function callDriveScript(args, session) {
+        console.log('DRIVER');
         var pyshellDrive = new PythonShell(PATH_DROPBOX_UPDATE);
 
         console.log('Drive Start!');
