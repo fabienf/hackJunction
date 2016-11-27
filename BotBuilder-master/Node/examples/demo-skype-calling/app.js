@@ -186,7 +186,7 @@ function sendMessage(session, text, info) {
     
     if (info && info == 'highlight') {
         // text = "<span style=\"background-color:blue;\">" + text + "</span>";
-        text = "<i>" + text + "</i>";
+        text = "**[SPEECH]: **"+"<i>" + text + "</i>";
         console.log(text);
     }
     
@@ -227,8 +227,10 @@ function analyzeContent(session, content) {
         console.log("intent: ", intent);
         if (intent == 'ShowImage') 
             intentReadGmail(session, entities);
-        if (intent == 'ReadMail')
+        else if (intent == 'ReadMail')
             intentReadMail(session, entities);
+        else if (intent == 'OpenCalendar')
+            intentOpenCalendar(session);
     });
 
 }
@@ -326,7 +328,7 @@ function sendGmailMessage(session, content) {
     });
 }
 
-function callGmailScript(session,date,categories) {
+function callGmailScript(session, date, categories) {
         var pyshellGmail = new PythonShell(PATH_GMAIL_SCRIPT, { mode: 'json'});
         console.log('Gmail Start');
 
@@ -404,6 +406,11 @@ function intentReadMail(session,entities) {
             console.log("ERROR: Resolution not found :(");
         }
         
+}
+
+function intentOpenCalendar(session, entities) {
+    console.log('SEND CALENDAR');
+    sendMessage(session, "https://calendar.google.com/calendar/render#main_7");
 }
 
 
