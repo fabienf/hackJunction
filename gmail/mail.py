@@ -70,11 +70,18 @@ def filter_by_topic( xs, ts ):
     if type( ts ) is not list:
         ts = [ts]
 
+
+    emails = [ e[0]+' '+e[1] for e in xs]
+
     filtered = []
-    for x in xs:
-        y = predict( x )
+    for i in range(len(xs)):
+        y = predict( emails[i] )
         if any( [topic in y.keys() for topic in ts] ):
-            filtered.append( x )
+            filtered.append( xs[i] )
+    # for x in xs:
+    #     y = predict( x )
+    #     if any( [topic in y.keys() for topic in ts] ):
+    #         filtered.append( x )
 
     return filtered
 

@@ -113,7 +113,9 @@ def get_emails_text(service=None, userId='me', from_address=None, to_address=Non
         # body = str( messages[i]['snippet'] )
         subject = get_subject(messages[i])  # str to convert from unicode to string
         body = messages[i]['snippet'] 
-        messages_text.append([subject,body])
+        mail_id = messages[i]['id'] 
+        mail_link = "https://mail.google.com/mail/u/0/#inbox/"+mail_id
+        messages_text.append([subject,body,mail_link])
 
     return messages_text
 
@@ -205,7 +207,6 @@ def main():
     emails = get_emails_text(from_address=from_address, to_address=to_address, before=before, after=after, keywords=keywords)
 
 
-    emails = [ e[0]+'\n'+e[1] for e in emails]
     # print emails
 
     if len(categories)>0:
