@@ -77,6 +77,13 @@ server.post('/api/messages', function (req, res) {
 // Calling Dialogs
 //=========================================================
 
+// just so that we can msg to brocolli
+chatBot.dialog('/', [
+    function(){},
+    function(){}
+]); 
+
+
 var lastSaid = "empty"
 function stt(session, audio_data) {
     var pyshell = new PythonShell(PATH_DIALOG_TO_TEXT);
@@ -90,7 +97,6 @@ function stt(session, audio_data) {
     log("[INFO]: ","SENT MSG");
     pyshell.on('message', function (message) {
         var key = "#135246#"
-        var gmail_key = "#98766#"
         console.log(message.substring(0, key.length));
         console.log(message.substring(0, key.length).indexOf(key));
         // Speech msg recieved here (content)
@@ -99,18 +105,12 @@ function stt(session, audio_data) {
             log('SAY', content);
             lastSaid = content;
             analyzeContent(session, content);
-            sendMessage(session, content);
+            sendMessage(session, content, 'highlight');
             session.replaceDialog('/', { full: false });
+        } else {
+            console.log("M: ", message);
         }
         
-        // else if (message.substring(0, gmail_key.length).indexOf(gmail_key) >= 0){
-        //     console.log("GMAIL YAY!");
-        //     sendGmailMessage(session, message);
-        // }
-        
-        
-        
-        console.log("M: ", message);
     });
     
     pyshell.end(function (err) {
@@ -145,6 +145,7 @@ function initiateRecord(session) {
 
 bot.dialog('/', [
     function (session) {
+        // sendMessage(session, 'Test message', 'highlight');
         log('SESSION', 'started');
         initiateRecord(session);
     },
@@ -180,23 +181,24 @@ function log(status, logMsg) {
     console.log(status, logMsg);
 }
 
-function sendMessage(session, msg) {
+function sendMessage(session, text, info) {
     var address = session.message.address;
     
+    if (info && info == 'highlight') {
+        // text = "<span style=\"background-color:blue;\">" + text + "</span>";
+        text = "<i>" + text + "</i>";
+        console.log(text);
+    }
     
     var oldId = address.user['id'];
     if (address.threadId) {
         address.user['id'] = address.threadId;
     }
     
-    // console.log('start');
-    // console.log(address);
-    // console.log('end');
-    
     delete address.conversation;
 
     var msg = new builder.Message(session)
-        .text(msg);
+        .text(text);
         
     chatBot.send(msg, function (err) {
         address.user['id'] = oldId;
@@ -238,7 +240,7 @@ function analyzeContent(session, content) {
 //=========================================================
 
 // Create LUIS recognizer that points at our model and add it as the root '/' dialog for our Cortana Bot.
-//  var model = LUIS_URL;
+// var model = LUIS_URL;
 // var recognizer = new builder.LuisRecognizer(model);
 // var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
 
@@ -314,11 +316,6 @@ function sendGmailMessage(session, content) {
                 .tap(builder.CardAction.openUrl(session, "https://www.gmail.com"))
         ]);
     
-    // Send message through chat bot
-    // chatBot.send(msg, function (err) {
-    //     session.endDialog(err ? prompts.chat.failed : prompts.chat.sent);
-    // });
-    
     console.log("Sending GMAIL message");
     chatBot.send(msg, function (err) {
         if (err) {
@@ -332,8 +329,6 @@ function sendGmailMessage(session, content) {
 function callGmailScript(session,date,categories) {
         var pyshellGmail = new PythonShell(PATH_GMAIL_SCRIPT, { mode: 'json'});
         console.log('Gmail Start');
-        // console.log(date);
-        // console.log(categories);
 
         if (date & categories)
             pyshellGmail.send({"date":date, "categories":[categories]}); // put here json object with the query inputs
